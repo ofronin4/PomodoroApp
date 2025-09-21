@@ -34,6 +34,7 @@ class MainActivity : AppCompatActivity() {
 
     private var sessionCount = 1
 
+    private var everStarted = false
 
     private fun chillTimer() {
         cycle = true
@@ -54,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         seconds = 0
         timeLeftInMillis = minutes * 60 * 1000
         startTimer()
-        working == true
+        working = true
         minutes = 5
         seconds = 0
 
@@ -76,12 +77,12 @@ class MainActivity : AppCompatActivity() {
 
                 override fun onFinish() {
                     isTimerRunning = false
-                    timerTextView.text = "00:00"
+
 
                     if (cycle == true) {
                         sessionCount++
                         sessionNumber.text = "SESSION $sessionCount"
-                        working == true
+                        working = true
                     }
                 }
             }.start()
@@ -119,6 +120,7 @@ class MainActivity : AppCompatActivity() {
                 startTimer()
                 isPause = false
             } else {
+
                 if (working == false) {
                     workTimer()
                 } else {
@@ -128,6 +130,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         startButton.setOnClickListener {
+            everStarted = true
             startSound.start()
             if (!isTimerRunning) {
                 startProgram()
@@ -147,6 +150,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         resetButton.setOnClickListener {
+            everStarted = false
             working = false
             cycle = false
             minutes = 25
@@ -160,18 +164,30 @@ class MainActivity : AppCompatActivity() {
         }
 
         skipButton.setOnClickListener {
+            if(everStarted == true){
+            countDownTimer?.cancel()
             isTimerRunning = false
-            timerTextView.text = String.format("%02d:%02d", minutes, seconds)
-            if (cycle == true){
+
+            if (working) {
+                minutes = 5
+                seconds = 0
+                working = false
+                cycle = true
+            } else {
+                minutes = 25
+                seconds = 0
+                working = true
+                cycle = false
                 sessionCount++
-                sessionNumber.text = "SESSION $sessionCount"
-                working == true
 
             }
 
-            countDownTimer?.cancel()
-            isTimerRunning = false
-            working = !working
+            timeLeftInMillis = minutes * 60 * 1000
+            timerTextView.text = String.format("%02d:%02d", minutes, seconds)
+            sessionNumber.text = "SESSION $sessionCount"
+
+
+            isPause = true}
         }
 
 
